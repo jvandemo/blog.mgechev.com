@@ -22,7 +22,7 @@ title: Machine Learning-Driven Bundling. The Future of JavaScript Tooling.
 url: /2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react
 ---
 
-In this article, I'll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. **The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users' behavior performs the most optimal build.** We're also going to introduce a **webpack plugin which works with Angular CLI and Create React App**.
+In this article, I'll introduce the early implementation of a few tools which, based on techniques from the machine learning, allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. **The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users' behavior performs the most optimal build.** We're also going to introduce a **webpack plugin which works with Angular CLI and Create React App**.
 
 **Such tool can improve the user-perceived page load performance by making the build process of our applications data-driven!** The final result is achieved by combining and/or pre-fetching JavaScript chunks which are most likely to be requested together in the same user session.
 
@@ -78,13 +78,13 @@ Obviously, data-driven chunk clustering and pre-fetching are both quite useful. 
 
 In this blog post, I'll demonstrate how combining a few tools we can automate the process of data-driven chunk clustering and data-driven pre-fetching. The [packages](https://github.com/mgechev/mlx)<sup>[8]</sup> and the [code](https://github.com/mgechev/ng-dd-bundled)<sup>[9]</sup> [samples](https://github.com/mgechev/react-dd-bundled)<sup>[10]</sup> can be found at my [GitHub profile](https://github.com/mgechev).
 
-In the first a couple of sections, we'll cover the individual tools from the [`mlx`](https://github.com/mgechev/mlx) monorepo and explain how they work together. After that, we'll dig into implementation details starting with an optional, theoretical introduction to the mathematical foundation of the project. Although, saying "mathematical foundation" may sound a bit frustrating, the covered topics are essential and it's very likely you're already familiar with them. We're going to mention few algorithms from the graph theory and one popular machine learning model. Right after that, we're going to define few concepts in order to make sure we speak the same language. Finally, in details, we'll discuss how everything from `@mlx` works together.
+In the first couple of sections, we'll cover the individual tools from the [`mlx`](https://github.com/mgechev/mlx) monorepo and explain how they work together. After that, we'll dig into implementation details starting with an optional, theoretical introduction to the mathematical foundation of the project. Although, saying "mathematical foundation" may sound a bit frustrating, the covered topics are essential and it's very likely you're already familiar with them. We're going to mention a few algorithms from the graph theory and one popular machine learning model. Right after that, we're going to define a few concepts in order to make sure we speak the same language. Finally, in details, we'll discuss how everything from `@mlx` works together.
 
 # Tooling Introduction
 
 **Disclaimer**: the packages that we're going to cover are in a very early stage of their development. It's very likely that they are incompatible with your projects. Keep in mind that their APIs are not finalized. Over time their implementation will mature and get more robust.
 
-The examples with the article use two identical Angular and React applications. The routing trees of these apps are the same as the routing tree of a production application that I've worked on in the past. The Google Analytics data used for the data-driven build is based on the original application.
+The examples in the article use two identical Angular and React applications. The routing trees of these apps are the same as the routing tree of a production application that I've worked on in the past. The Google Analytics data used for the data-driven build is based on the original application.
 
 The Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[9]</sup> and the React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[10]</sup>. Both projects are ejected from the official CLI tools of the corresponding framework.
 
@@ -337,7 +337,7 @@ Let's suppose we have an application with the pages `/a`, `/a/a`, `/a/b`, `/b`, 
 
 ## Navigation Graph
 
-The graph above we'll call **navigation graph**. The individual nodes in the navigation graph are the pages of our application and the edges between them represent the transitions from one page to another. It's important to mention that the **navigation graph is directed**. Usually, the edges between the individual nodes are represented by links in our application. This means that if we have an edge between `/a` and `/b`, we most likely have a link between these two pages. Of course, another way the user to navigate between `/a` and `/b` is by directly using the address bar of the browser. The navigation graph encapsulates both types of transitions.
+The graph above we'll call **navigation graph**. The individual nodes in the navigation graph are the pages of our application and the edges between them represent the transitions from one page to another. It's important to mention that the **navigation graph is directed**. Usually, the edges between the individual nodes are represented by links in our application. This means that if we have an edge between `/a` and `/b`, we most likely have a link between these two pages. Of course, another way the user can navigate between `/a` and `/b` is by directly using the address bar of the browser. The navigation graph encapsulates both types of transitions.
 
 We're going to build the navigation graph from a Google Analytics report using the package `@mlx/ga`. We'll cover this tool later in the article.
 
@@ -364,7 +364,7 @@ The declarations of the routes of the application form a tree-like structure. Fo
 
 ## Bundle Routing Tree
 
-If we suppose that all the routes in the application are associated with entry points of chunks then our bundle tree's shape matches the routing tree. The only difference is that the routing tree's nodes will be named after the routes and the bundle routing tree's nodes are going to be named after the entry points of the chunks.
+If we assume that all the routes in the application are associated with entry points of chunks then our bundle tree's shape matches the routing tree. The only difference is that the routing tree's nodes will be named after the routes and the bundle routing tree's nodes are going to be named after the entry points of the chunks.
 
 Now let's suppose we have the following route declarations:
 
@@ -501,9 +501,9 @@ This is stripped version of the graph that I used for developing the two example
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.2.9/cytoscape.js"></script>
 <script src="/assets/js/mlx/graph.js"></script>
 
-The thicker given edge is, the more likely it is the user to perform the corresponding transition. The graph from the visualization is intentionally undirected to make the diagram less noisy.
+The thicker given edge is, the more likely it is that the user performs the corresponding transition. The graph from the visualization is intentionally undirected to make the diagram less noisy.
 
-You can find demo of this module [here](https://github.com/mgechev/mlx-ga-demo)<sup>[11]</sup>. As prerequirement, download your private key from the Google Developer Console, place it in `credentials.json` and replace the [view ID with the one of your web app](http://2ality.com/2015/10/google-analytics-api.html)<sup>[12]</sup>.
+You can find a demo of this module [here](https://github.com/mgechev/mlx-ga-demo)<sup>[11]</sup>. As a prerequisite, download your private key from the Google Developer Console, place it in `credentials.json` and replace the [view ID with the one of your web app](http://2ality.com/2015/10/google-analytics-api.html)<sup>[12]</sup>.
 
 ## `@mlx/webpack`
 
@@ -561,10 +561,7 @@ export interface Graph {
 
 - `debug` indicates if the plugin's verbose logging should be enabled.
 - `data` is the page graph gotten from Google Analytics.
-- `routeProvider` is a function which returns the mapping between routes and chunk entry points. If a `routeProvider` is not specified, `@mlx/webpack` will use the default route provider implementation from `@mlx/parser`. This is **extremely powerful configuration property**. If you have a React application and the default `routeProvider` doesn't work you can provide a custom function which returns the metadata:
-  ```ts
-  new MLPlugin({ data, routeProvider: () => [{...}, {...}] })
-  ```
+- `routeProvider` is a function which returns the mapping between routes and chunk entry points. If a `routeProvider` is not specified, `@mlx/webpack` will use the default route provider implementation from `@mlx/parser`. This is **extremely powerful configuration property**. If you have a React application and the default `routeProvider` doesn't work you can provide a custom function which returns the metadata: `new MLPlugin({ data, routeProvider: () => [{...}, {...}] })`
 - `runtime` configures the plugin for data-driven bundle pre-fetching. With this property, we can either specify an optional `basePath` and/or `prefetchConfig` or disable the pre-fetching completely.
 - `build` is the part of the `@mlx/webpack` plugin which by default groups the webpack chunks based on the clustering algorithm performed by `@mlx/cluster`. We can think of it as an algorithm which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group (integrate) some chunks together.
 
@@ -596,13 +593,13 @@ My recommendation would be to implement a parser in order to keep your applicati
 
 ### Performed Algorithm
 
-Once the line `new MLPlugin({ data: require('./path/to/data.json') })` gets evaluated, few steps will happen:
+Once the line `new MLPlugin({ data: require('./path/to/data.json') })` gets evaluated, the following steps will take place:
 
 - `MLPlugin` will check for a `routeProvider`. If it doesn't discover such, it'll try to guess your application type (i.e. Angular or React) by looking at `package.json` and try to discover the `tsconfig.json` file of the project.
-- If it succeeds, it'll invoke the `@mlx/parser` and collect all the routes, the associated with them chunk entry points, and their parent chunk entry point.
+- If it succeeds, it'll invoke the `@mlx/parser` and collect all the routes, their associated chunk entry points and their parent chunk entry point.
 - It'll initialize the `ClusterChunksPlugin` and `RuntimePrefetchPlugin`.
 
-**`ClusterChunksPlugin` is used for combining chunks** and **`RuntimePrefetchPlugin` is used for** injecting a small piece of code which will make our application **pre-fetch chunks based on the user's behavior, the provided data from Google Analytics, and the user's connection speed**.
+**`ClusterChunksPlugin` is used for combining chunks** and **`RuntimePrefetchPlugin` is used for** injecting a small piece of code which will make our application **pre-fetch chunks based on the user's behavior, the provided data from Google Analytics and the user's connection speed**.
 
 In other words, **`RuntimePrefetchPlugin` performs predictive and adaptive pre-fetching**.
 
@@ -648,7 +645,7 @@ export interface RuntimePrefetchConfig {
 }
 ```
 
-The `graph` passed here is the Google Analytics graph we got from `@mlx/ga` (i.e., either a navigation or a page graph). The `routes` array contains one object per route. Each object has a `modulePath` of the chunk entry point associated with the given route, `parentModulePath` which equals the path of the entry point of the parent module, and a `path` which equals to the route that this object represents.
+The `graph` passed here is the Google Analytics graph we got from `@mlx/ga` (i.e. either a navigation or a page graph). The `routes` array contains one object per route. Each object has a `modulePath` of the chunk entry point associated with the given route, `parentModulePath` which equals the path of the entry point of the parent module, and a `path` which equals to the route that this object represents.
 
 `prefetchConfig` is also configurable! It contains the pre-fetching thresholds depending on the value of `window.navigator.connection.effectiveType`. Since `connection.effectiveType` is currently supported only by Chrome, the plugin will use the `3g` thresholds by default.
 
@@ -968,7 +965,7 @@ Both parsers perform static analysis. The Angular parser uses an abstraction on 
 
 The final package that we're going to cover is the clustering algorithm. As input, it accepts:
 
-- `bundleGraph: Graph` - a weighted bundle page graph which is the result of the transformation of the weighed page graph.
+- `bundleGraph: Graph` - a weighted bundle page graph which is the result of the transformation of the weighted page graph.
 - `modules: Module[]` - since the `bundleGraph` can represent only a partial part of the entire application (because of limited information from Google Analytics, for example), we need the entry points of the lazy-loaded chunks and their parents to be provided separately. This is the bundle page graph that we defined above.
 - `n: number` - `n` is the minimum number of chunks that we want to get at the end of the clustering algorithm.
 
